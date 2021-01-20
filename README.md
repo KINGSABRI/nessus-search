@@ -1,5 +1,5 @@
 # nessus-search
-parse nessus report and search for specific data
+parse nessus report and search for specific data. The script has been built to help after running nessus multiple scans during pentest and at writing the report.
 
 ## Requirements
 ```
