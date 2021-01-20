@@ -2,7 +2,6 @@
 #
 # gem install ruby-nessus
 #
-
 require 'nessus'
 require 'optparse'
 
@@ -38,7 +37,6 @@ class NessusParser
   #   events
   # end
 
-  # ruby nessus-findings.rb -p nessus-scans/sp/ -l
   def list_vulnerabilities
 
     @critical_list = []
@@ -71,8 +69,7 @@ class NessusParser
 
     services = []
     info_list.flatten.each do |event|
-      if event.name =~ /Service Detection/i
-        # puts 11111
+      if event.name =~ /Service Detection|Server Detection/i
         services << event.port
       end
     end
@@ -92,7 +89,8 @@ class NessusParser
         
         all_findings.flatten.uniq&.map do |event|
           if event.name =~ /.*#{vuln_name}.*/i
-            vulns << "#{event.risk.ljust(10)}#{event.name}"
+            risk  = event.risk ? event.risk : "" # fix if risk is false
+            vulns << "#{risk.ljust(10)}#{event.name}"
           end
         end
       end
@@ -101,7 +99,6 @@ class NessusParser
     vulns.uniq
   end
 
-  # ruby nessus-findings.rb -p nessus-scans/sp/ -V "X11 Server Unauthenticated Access"
   def find_hosts_by_vulnerability(vuln_name, opts={inc_port: true})
     vuln_hosts = []
     @scans.flatten.uniq.each do |scan|
@@ -127,7 +124,6 @@ class NessusParser
     vuln_hosts.uniq
   end
 
-  # ruby nessus-findings.rb -p nessus-scans/sp/ -S tomcat
   def find_hosts_by_service(srv_name)
     hosts = []
     @scans.flatten.uniq.each do |scan|
@@ -165,7 +161,6 @@ class NessusParser
     found
   end
 
-  # ruby nessus-findings.rb -p nessus-scans/sp/ --ip 10.1.22.11 
   def ip_vulnerabilties(ip)
     @critical_list = []
     @high_list     = []
@@ -239,7 +234,7 @@ option_parser = OptionParser.new do |opts|
 
   opts.on("-i", "--ip IP_ADDR", "Find vulnerabilities for a specific IP address") {|n| v = n}
 
-  opts.on("-S", "--services", "List discovered services with its ports") {|n| v = n}
+  opts.on("-S", "--services", "List discovered services and servers with its ports") {|n| v = n}
 
   opts.on("-s", "--srv SRV_NAME", "Find hosts by service name (use \"\" to list all services for all hosts)") {|n| v = n}
 
@@ -391,6 +386,7 @@ begin
     
     info = @info.flatten.uniq
     puts "\n[+] Informational: (#{info.size})"
+    puts info
     puts "----------"  
   end
 
