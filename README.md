@@ -153,4 +153,16 @@ ssh (115/tcp)
 ...DETUCTED...
 ```
 
+- Find hosts by service name
+```
+$ ruby nessus-search.rb -p nessus-scans -s telnet
+
+[+] hosts with telnet service: (113)
+192.168.100.50 telnet (23/tcp)
+192.168.100.55 telnet (23/tcp)
+192.168.100.84 telnet (23/tcp)
+192.168.100.24 telnet (23/tcp)
+192.168.100.44 telnet (23/tcp)
+```
+
 
