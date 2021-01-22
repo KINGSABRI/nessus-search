@@ -16,27 +16,6 @@ class NessusParser
     Nessus::Parse.new(nessus_file) {|scan| @scans << scan}
   end
 
-  # def vulnerabilities
-  #   events = {critical: [], high: [], medium: [], low: [], info: []}
-  #   @scans.flatten.uniq.each do |scan|
-  #     scan.hosts.each do |host|
-  #       events[:critical] << host.critical_severity_events.to_a
-  #       events[:high]     << host.high_severity_events.to_a
-  #       events[:medium]   << host.medium_severity_events.to_a
-  #       events[:low]      << host.low_severity_events.to_a
-  #       events[:info]     << host.informational_severity_events.to_a      
-  #     end
-  #   end
-
-  #   # events[:critical]&.flatten!
-  #   # events[:high]&.flatten!
-  #   # events[:medium]&.flatten!
-  #   # events[:low]&.flatten!
-  #   # events[:info]&.flatten!
-
-  #   events
-  # end
-
   def list_vulnerabilities
 
     @critical_list = []
@@ -44,7 +23,6 @@ class NessusParser
     @medium_list   = []
     @low_list      = []
     @info_list     = []
-
 
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
@@ -69,7 +47,7 @@ class NessusParser
 
     services = []
     info_list.flatten.each do |event|
-      if event.name =~ /Service Detection|Server Detection/i
+      if event.name.match? /Service Detection|Server Detection/i
         services << event.port
       end
     end
@@ -88,8 +66,8 @@ class NessusParser
         all_findings << host.informational_severity_events.to_a
         
         all_findings.flatten.uniq&.map do |event|
-          if event.name =~ /.*#{vuln_name}.*/i
-            risk  = event.risk ? event.risk : "" # fix if risk is false
+          if event.name.match? /.*#{vuln_name}.*/i
+            risk  = event.risk.match?("None") ? "info" : event.risk
             vulns << "#{risk.ljust(10)}#{event.name}"
           end
         end
@@ -111,7 +89,7 @@ class NessusParser
         all_findings << host.informational_severity_events.to_a
         
         all_findings.flatten.uniq&.map do |event|
-          if event.name =~ /#{vuln_name}/i
+          if event.name.match? /#{vuln_name}/i
             if opts[:inc_port]
               vuln_hosts << ["#{host.ip} #{event.port}", (event.output ? event.output&.squeeze : "----- NO OUTPUT AVAILABLE -----")]
             else
@@ -129,7 +107,7 @@ class NessusParser
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
         host.informational_severity_events.map do |event|
-          if event.name =~ /#{srv_name}/i
+          if event.name.match? /#{srv_name}/i
             hosts << "#{host.ip} #{event.port}"
           end
         end
