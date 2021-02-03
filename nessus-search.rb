@@ -103,12 +103,16 @@ class NessusParser
   end
 
   def find_hosts_by_service(srv_name)
+    srv_name = "www" if srv_name.downcase.include?("http") # because nessus is using www for http protocol
+
     hosts = []
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
         host.informational_severity_events.map do |event|
-          if event.name.match? /#{srv_name}/i
-            hosts << "#{host.ip} #{event.port}"
+          if event.name.match? /Service Detection|Server Detection/i
+            if event.port.to_s.match? /#{srv_name}/i
+              hosts << "#{host.ip} #{event.port}"
+            end
           end
         end
       end
