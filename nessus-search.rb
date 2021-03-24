@@ -38,16 +38,22 @@ class NessusParser
   end
 
   def list_services
-    info_list = []
+    events = []
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
-        info_list << host.informational_severity_events.to_a
+        events << [
+          host.critical_severity_events.to_a,
+          host.high_severity_events.to_a,
+          host.medium_severity_events.to_a,
+          host.low_severity_events.to_a,
+          host.informational_severity_events.to_a
+        ].flatten
       end
     end
 
     services = []
-    info_list.flatten.each do |event|
-      if event.name.match? /Service Detection|Server Detection/i
+    events.flatten.each do |event|
+      if event.name.match?(/(.*Service Detection)|(.*Server Detection)|(.*Daemon Detection)/i)
         services << event.port
       end
     end
@@ -66,7 +72,7 @@ class NessusParser
         all_findings << host.informational_severity_events.to_a
         
         all_findings.flatten.uniq&.map do |event|
-          if event.name.match? /.*#{vuln_name}.*/i
+          if event.name.match?(/.*#{vuln_name}.*/i)
             risk  = event.risk.match?("None") ? "info" : event.risk
             vulns << "#{risk.ljust(10)}#{event.name}"
           end
@@ -108,9 +114,15 @@ class NessusParser
     hosts = []
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
-        host.informational_severity_events.map do |event|
-          if event.name.match? /Service Detection|Server Detection/i
-            if event.port.to_s.match? /#{srv_name}/i
+        [
+          host.critical_severity_events.to_a,
+          host.high_severity_events.to_a,
+          host.medium_severity_events.to_a,
+          host.low_severity_events.to_a,
+          host.informational_severity_events.to_a
+        ].flatten.each do |event|
+          if event.name.match?(/(.*Service Detection)|(.*Server Detection)|(.*Daemon Detection)/i)
+            if event.port.to_s.match?(/#{srv_name}/i)
               hosts << "#{host.ip} #{event.port}"
             end
           end
