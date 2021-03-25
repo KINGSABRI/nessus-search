@@ -42,10 +42,10 @@ class NessusParser
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
         events << [
-          host.critical_severity_events.to_a,
-          host.high_severity_events.to_a,
-          host.medium_severity_events.to_a,
-          host.low_severity_events.to_a,
+          # host.critical_severity_events.to_a,
+          # host.high_severity_events.to_a,
+          # host.medium_severity_events.to_a,
+          # host.low_severity_events.to_a,
           host.informational_severity_events.to_a
         ].flatten
       end
@@ -115,10 +115,10 @@ class NessusParser
     @scans.flatten.uniq.each do |scan|
       scan.hosts.each do |host|
         [
-          host.critical_severity_events.to_a,
-          host.high_severity_events.to_a,
-          host.medium_severity_events.to_a,
-          host.low_severity_events.to_a,
+          # host.critical_severity_events.to_a,
+          # host.high_severity_events.to_a,
+          # host.medium_severity_events.to_a,
+          # host.low_severity_events.to_a,
           host.informational_severity_events.to_a
         ].flatten.each do |event|
           if event.name.match?(/(.*Service Detection)|(.*Server Detection)|(.*Daemon Detection)/i)
