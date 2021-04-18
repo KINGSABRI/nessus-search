@@ -193,7 +193,7 @@ class NessusParser
           info[:name]        = event.name
           info[:severity]    = event.severity
           info[:risk]        = event.risk
-          info[:description] = event.description
+          info[:description] = event.description.gsub("     ", " ")
           info[:solution]    = event.solution
           info[:cve]         = event.cve
           info[:output]      = event.output ? event.output&.squeeze : "----- NO OUTPUT AVAILABLE -----"
