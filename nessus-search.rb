@@ -40,7 +40,7 @@ class NessusParser
   def list_services
     events = []
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         events << [
           # host.critical_severity_events.to_a,
           # host.high_severity_events.to_a,
@@ -63,7 +63,7 @@ class NessusParser
   def find_vulnerabilities(vuln_name)
     vulns = []
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         all_findings = []
         all_findings << host.critical_severity_events.to_a
         all_findings << host.high_severity_events.to_a
@@ -86,7 +86,7 @@ class NessusParser
   def find_hosts_by_vulnerability(vuln_name, opts={inc_port: true})
     vuln_hosts = []
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         all_findings = []
         all_findings << host.critical_severity_events.to_a
         all_findings << host.high_severity_events.to_a
@@ -113,7 +113,7 @@ class NessusParser
 
     hosts = []
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         [
           # host.critical_severity_events.to_a,
           # host.high_severity_events.to_a,
@@ -136,7 +136,7 @@ class NessusParser
     found = {vuln_name: nil, hosts: []}
     
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         all_findings = []
         all_findings << host.critical_severity_events.to_a
         all_findings << host.high_severity_events.to_a
@@ -162,7 +162,7 @@ class NessusParser
     @low_list      = []
     @info_list     = []    
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         next unless host.ip == ip                
         @critical_list << host.critical_severity_events&.map(&:name)
         @high_list     << host.high_severity_events&.map(&:name)
@@ -179,7 +179,7 @@ class NessusParser
     info = {}
 
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|
         all_findings = []
         all_findings << host.critical_severity_events.to_a
         all_findings << host.high_severity_events.to_a
