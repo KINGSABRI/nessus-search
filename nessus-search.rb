@@ -25,7 +25,7 @@ class NessusParser
     @info_list     = []
 
     @scans.flatten.uniq.each do |scan|
-      scan.hosts.each do |host|
+      scan.each_host do |host|      
         @critical_list << host.critical_severity_events&.map(&:name)
         @high_list     << host.high_severity_events&.map(&:name)
         @medium_list   << host.medium_severity_events&.map(&:name)
